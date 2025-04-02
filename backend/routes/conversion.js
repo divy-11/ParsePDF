@@ -13,8 +13,9 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
+        console.log("hit hua");
 
-        const pdfBuffer = fs.readFileSync(req.file.path);
+        const pdfBuffer = fs.readFile(req.file.path);
         const data = await pdfParse(pdfBuffer);
 
         const jsonData = {
@@ -40,10 +41,19 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
             xmlContent: extractedData,
         });
 
-        fs.unlinkSync(req.file.path);
+        fs.unlink(req.file.path)
+            .then(() => console.log("File deleted successfully"))
+            .catch((err) => console.error("File deletion error:", err));
 
         res.status(200).json({ conversionId: newConversion._id, newConversion });
     } catch (error) {
+        console.log(error);
+        if (req.file && req.file.path) {
+            await fs.unlink(req.file.path).catch((err) =>
+                console.error("Failed to delete file:", err)
+            );
+        }
+
         res.status(500).json({ error: error.message });
     }
 });

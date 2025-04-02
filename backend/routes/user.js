@@ -4,7 +4,7 @@ const app = express.Router()
 const { User } = require("../db")
 const jwt = require("jsonwebtoken");
 const JWT_TOKEN = process.env.TOKEN_AUTH;
-const COOKIE_OPTIONS = { httpOnly: true, secure: true, sameSite: "strict" };
+const COOKIE_OPTIONS = { httpOnly: true, secure: true, sameSite: "lax" };
 
 app.post("/signup", async (req, res) => {
     const username = req.body.name
@@ -36,7 +36,7 @@ app.post("/signup", async (req, res) => {
     }
 });
 
-app.post("/signin", async (req, res) => {
+app.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const userCheck = await User.findOne({ email, password });
