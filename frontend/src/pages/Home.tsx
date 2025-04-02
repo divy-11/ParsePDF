@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileUpload } from '../components/FileUpload';
 import { Layout } from '../components/Layout';
 import axios from 'axios';
+import XMLViewer from 'react-xml-viewer';
 
 export function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -30,8 +31,8 @@ export function Home() {
         { withCredentials: true }
       );
 
-      // setConversionResult(response.data.xmlContent);
-      console.log("Conversion Successful:", response.data);
+      setConversionResult(response.data.newConversion.xmlContent);
+      console.log("Conversion Successful!");
     } catch (error) {
       console.error("Error uploading file:", error);
       alert("Conversion failed. Please try again.");
@@ -70,7 +71,9 @@ export function Home() {
         {conversionResult && (
           <div className="mt-6 bg-green-50 p-4 rounded-lg">
             <p className="text-sm text-green-700">Conversion successful!</p>
-            <pre className="bg-gray-100 p-2 rounded">{conversionResult}</pre>
+            <div className="overflow-auto max-h-96 border p-2 bg-white rounded">
+              <XMLViewer xml={conversionResult} />
+            </div>
           </div>
         )}
       </div>

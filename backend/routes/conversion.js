@@ -13,9 +13,9 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
-        console.log("hit hua");
+        // console.log("hit hua");
 
-        const pdfBuffer = fs.readFile(req.file.path);
+        const pdfBuffer = fs.readFileSync(req.file.path);
         const data = await pdfParse(pdfBuffer);
 
         const jsonData = {
@@ -33,25 +33,26 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
         const builder = new XMLBuilder();
         const extractedData = builder.build(jsonData);
         const convertedSize = Buffer.byteLength(extractedData, "utf8");
+
         const newConversion = await Conversion.create({
-            userId: req.user.id,
+            userId: req.user.userId,
             fileName: req.file.originalname,
             originalSize: req.file.size,
             convertedSize,
             xmlContent: extractedData,
         });
 
-        fs.unlink(req.file.path)
-            .then(() => console.log("File deleted successfully"))
-            .catch((err) => console.error("File deletion error:", err));
+        await fs.promises.unlink(req.file.path)
 
         res.status(200).json({ conversionId: newConversion._id, newConversion });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         if (req.file && req.file.path) {
-            await fs.unlink(req.file.path).catch((err) =>
-                console.error("Failed to delete file:", err)
-            );
+            try {
+                await fs.promises.unlink(req.file.path);
+            } catch (err) {
+                console.error("Failed to delete file:", err);
+            }
         }
 
         res.status(500).json({ error: error.message });
@@ -75,6 +76,7 @@ app.get("/conversion/:id", authUser, async (req, res) => {
         const { id } = req.params;
         const conversion = await Conversion.findById(id).lean();
         if (!conversion) return res.status(404).json({ message: "Conversion not found" });
+        
         if (conversion.userId.toString() !== req.user.userId) {
             return res.status(403).json({ message: "Access denied" });
         }
