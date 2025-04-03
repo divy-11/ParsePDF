@@ -4,11 +4,14 @@ import { Layout } from "../components/Layout";
 import axios from "axios";
 import XMLViewer from "react-xml-viewer";
 import { useNavigate } from "react-router-dom";
+import PdfPreview from "../components/PdfPreview";
 
 export function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [isConverting, setIsConverting] = useState<boolean>(false);
+  const [uploadedPdfUrl, setUploadedPdfUrl] = useState<string | null>(null);
+  const [showPreview,setShowPreview]=useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -19,6 +22,7 @@ export function Home() {
     }
     setSelectedFile(file);
     setConversionResult(null);
+    setUploadedPdfUrl(URL.createObjectURL(file));
     setErrorMessage(null);
   };
 
@@ -39,8 +43,8 @@ export function Home() {
         formData,
         { withCredentials: true }
       );
-
       setConversionResult(response.data.newConversion.xmlContent);
+      setShowPreview(false)
     } catch (err: any) {
       console.error("Error uploading file:", err);
       if (err.response?.status === 401) {
@@ -100,36 +104,55 @@ export function Home() {
           </button>
         )}
 
-        {conversionResult && (
-          <div className="mt-6 bg-green-50 p-4 rounded-lg">
-            <p className="text-sm text-green-700 font-medium">Conversion successful!</p>
 
-            <div className="overflow-auto max-h-96 border p-2 bg-white rounded relative">
-              <XMLViewer xml={conversionResult} />
+        {uploadedPdfUrl && (
+          <div className="mt-6 gap-6">
+            {uploadedPdfUrl && (
+              <div className="mt-4">
+                {/* Toggle Button for Preview */}
+                <button
+                  className="text-blue-600 text-sm hover:underline"
+                  onClick={() => setShowPreview(!showPreview)}
+                >
+                  {showPreview ? "Hide Preview" : "Show Preview"}
+                </button>
 
-              {/* Copy Button */}
-              <button
-                className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-sm px-2 py-1 rounded"
-                onClick={() => navigator.clipboard.writeText(conversionResult)}
-              >
-                Copy
-              </button>
-            </div>
+                {/* PDF Preview (Toggles On/Off) */}
+                {showPreview && <PdfPreview fileUrl={uploadedPdfUrl} />}
+              </div>
+            )}
 
-            {/* Download Button */}
-            <button
-              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              onClick={() => {
-                const blob = new Blob([conversionResult], { type: "text/xml" });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "converted.xml";
-                link.click();
-              }}
-            >
-              Download XML
-            </button>
-          </div>
+            {conversionResult && (
+              <div className="bg-green-50 p-4 rounded-lg">
+                <p className="text-sm text-green-700 font-medium">Conversion successful!</p>
+
+                <div className="overflow-auto max-h-96 border p-2 bg-white rounded relative">
+                  <XMLViewer xml={conversionResult} />
+
+                  {/* Copy Button */}
+                  <button
+                    className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-sm px-2 py-1 rounded"
+                    onClick={() => navigator.clipboard.writeText(conversionResult)}
+                  >
+                    Copy
+                  </button>
+                </div>
+
+                {/* Download Button */}
+                <button
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={() => {
+                    const blob = new Blob([conversionResult], { type: "text/xml" });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "converted.xml";
+                    link.click();
+                  }}
+                >
+                  Download XML
+                </button>
+              </div>
+            )}</div>
         )}
       </div>
     </Layout>

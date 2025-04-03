@@ -8,6 +8,9 @@ export interface User {
 export interface Conversion {
   _id: string;
   fileName: string;
+  userId:string;
+  originalSize: number; 
+  convertedSize: number; 
   createdAt: string;
   status: 'processing' | 'completed' | 'error';
   pdfUrl: string;

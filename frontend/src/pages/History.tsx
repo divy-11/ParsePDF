@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 export function History() {
   const [selConv, setSelConv] = useState<String | null>(null);
   const [convs, setConvs] = useState<Conversion[]>([])
+  const [load,setLoad]=useState<boolean>(true)
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ export function History() {
     try {
       const resp = await axios.get("http://localhost:6060/api/conversion/all", { withCredentials: true })
       setConvs(resp.data.conversions)
-      console.log(convs);
+      setLoad(false)
     } catch (err: any) {
       console.log("Error", err);
       if (err.response && err.response.status === 401) {
@@ -50,6 +51,7 @@ export function History() {
         <h1 className="text-2xl font-semibold text-gray-900 mb-8">
           Conversion History
         </h1>
+        {load&&(<h2>Loading ...</h2>)}
         <div className="space-y-4">
           {currentConversions.map((conv) => (
             <div key={conv._id}>
@@ -67,7 +69,7 @@ export function History() {
           ))}
         </div>
         {
-          (convs.length == 0) && (<div className="flex flex-col items-center justify-center py-10 text-gray-500">
+          (!load)&&(convs.length == 0) && (<div className="flex flex-col items-center justify-center py-10 text-gray-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
