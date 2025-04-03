@@ -21,9 +21,9 @@ export function Layout({ children }: LayoutProps) {
         </div>
         <nav className="p-4 space-y-1">
           <Link
-            to="/"
+            to="/home"
             className={`flex items-center px-4 py-2 text-sm rounded-lg ${
-              isActive('/') 
+              isActive('/home') 
                 ? 'bg-blue-50 text-blue-700' 
                 : 'text-gray-700 hover:bg-gray-100'
             }`}

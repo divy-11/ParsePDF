@@ -5,7 +5,7 @@ export interface User {
 }
 
 export interface Conversion {
-  id: string;
+  _id: string;
   fileName: string;
   createdAt: string;
   status: 'processing' | 'completed' | 'error';

@@ -59,7 +59,7 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
     }
 });
 
-app.get("/conversions", authUser, async (req, res) => {
+app.get("/all", authUser, async (req, res) => {
     try {
         const userId = req.user.userId;
         const conversions = await Conversion.find({ userId }).sort({ createdAt: -1 }).lean();
@@ -71,7 +71,7 @@ app.get("/conversions", authUser, async (req, res) => {
 });
 
 
-app.get("/conversion/:id", authUser, async (req, res) => {
+app.get("/:id", authUser, async (req, res) => {
     try {
         const { id } = req.params;
         const conversion = await Conversion.findById(id).lean();
