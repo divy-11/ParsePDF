@@ -15,7 +15,6 @@ export function Auth() {
   async function sendingReq(e: React.FormEvent) {
     e.preventDefault();
     try {
-      console.log("hit hua");
       const resp = await axios.post(`http://localhost:6060/api/user/${mode}`, {
         name,
         email,
@@ -24,7 +23,6 @@ export function Auth() {
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
 
       );
-      console.log(resp);
       navigate('/home');
     }
     catch (err) {

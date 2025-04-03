@@ -4,21 +4,25 @@ import { ConversionCard } from '../components/ConversionCard';
 import { Conversion } from '../types';
 import axios from 'axios';
 import XMLViewer from 'react-xml-viewer';
+import { useNavigate } from 'react-router-dom';
 
 export function History() {
   const [selConv, setSelConv] = useState<String | null>(null);
   const [convs, setConvs] = useState<Conversion[]>([])
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-
+  const navigate = useNavigate()
   const fetchConv = async () => {
     try {
       const resp = await axios.get("http://localhost:6060/api/conversion/all", { withCredentials: true })
-      // console.log(resp.data.conversions);
       setConvs(resp.data.conversions)
       console.log(convs);
-    } catch (error) {
-      console.log(error);
+    } catch (err: any) {
+      console.log("Error", err);
+      if (err.response && err.response.status === 401) {
+        navigate('/')
+        return
+      }
     }
   }
 
@@ -62,17 +66,43 @@ export function History() {
             </div>
           ))}
         </div>
-        <div className="mt-6 flex justify-between items-center">
-          <button onClick={handlePrevious} disabled={currentPage === 1} className="px-4 py-2 bg-gray-300 rounded">
+        {
+          (convs.length == 0) && (<div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-20 h-20 mb-3 text-gray-400"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6l4 2m0 0-4-2-4 2m8-2v4m0-4-4-2-4 2m8 4H8m4-14a9 9 0 11-9 9 9 9 0 019-9z"
+              />
+            </svg>
+            <p className="text-lg font-semibold mb-1">No conversions found</p>
+            <p className="text-sm mb-5">You haven't converted any files yet. Start by uploading a PDF.</p>
+            <button
+              onClick={() => navigate('/home')}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
+            >
+              Convert Now
+            </button>
+          </div>)
+        }
+        {!(convs.length == 0) && (<div className="mt-6 flex justify-between items-center">
+          <button onClick={handlePrevious} disabled={currentPage === 1} className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500">
             Previous
           </button>
           <span>
             Page {currentPage} of {totalPages}
           </span>
-          <button onClick={handleNext} disabled={currentPage === totalPages} className="px-4 py-2 bg-gray-300 rounded">
+          <button onClick={handleNext} disabled={currentPage === totalPages} className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500">
             Next
           </button>
-        </div>
+        </div>)}
       </div>
     </Layout>
   );

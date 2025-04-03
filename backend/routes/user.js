@@ -3,6 +3,7 @@ const express = require("express");
 const app = express.Router()
 const { User } = require("../db")
 const jwt = require("jsonwebtoken");
+const authUser = require('./middleware');
 const JWT_TOKEN = process.env.TOKEN_AUTH;
 const COOKIE_OPTIONS = { httpOnly: true, secure: true, sameSite: "lax" };
 
@@ -45,7 +46,7 @@ app.post("/login", async (req, res) => {
             return res.status(401).json({ message: "Invalid Creds" });
         }
 
-        const token = jwt.sign({ userID: userCheck._id }, JWT_TOKEN);
+        const token = jwt.sign({ userId: userCheck._id }, JWT_TOKEN);
         res.cookie("token", token, COOKIE_OPTIONS);
         res.status(200).json({
             token: 'Bearer ' + token,
@@ -57,22 +58,50 @@ app.post("/login", async (req, res) => {
     }
 });
 
-/*Under Work
-const updateSchema = z.object({
-    password: z.string().optional(),
-    lastName: z.string().optional(),
-    firstName: z.string().optional()
-});
-
-app.put("/", authUser, async (req, res) => {
-    const updateSuccess = updateSchema.safeParse(req.body);
-
-    if (updateSuccess.success) {
-        await Users.updateOne({ _id: req.userId }, req.body);
-        res.status(200).json({ message: "Updated successfully" });
-    } else {
-        res.status(400).json({ message: "Error while updating information" });
+app.post("/logout", (req, res) => {
+    try {
+        res.clearCookie("token", { path: "/", httpOnly: true, sameSite: "lax" });
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        console.log(error);
     }
 });
-*/
+
+app.get("/", authUser, async (req, res) => {
+
+    try {
+        if (!req.user.userId) {
+            return res.status(401).json({ message: "Please login first." });
+        }
+        const userId = req.user.userId;
+        // console.log("Hit Huaaaa");
+        const user = await User.findById(userId);
+        res.status(200).json({ name: user.name, email: user.email, _id: user._id });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
+app.put("/", authUser, async (req, res) => {
+    try {
+        if (!req.user.userId) {
+            return res.status(401).json({ message: "Please login first." });
+        }
+        const { curPass, ...updateData } = req.body;
+        const userId = req.user.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (user.password !== curPass) {
+            return res.status(400).json({ error: "Provide your old password carefully!!" });
+        }
+        await User.updateOne({ _id: req.user.userId }, updateData);
+        res.status(200).json({ message: "Updated successfully" });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ message: "Error while updating information" });
+    }
+});
+
 module.exports = app;

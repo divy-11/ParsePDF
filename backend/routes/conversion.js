@@ -6,15 +6,17 @@ const pdfParse = require("pdf-parse");
 const { XMLBuilder } = require("fast-xml-parser");
 const fs = require("fs");
 const authUser = require("./middleware");
+const { log } = require("console");
 const upload = multer({ dest: "uploads/" });
 
 app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
     try {
+        if (!req.user.userId) {
+            return res.status(401).json({ message: "Please login first." });
+        }
         if (!req.file) {
             return res.status(400).json({ error: "No file uploaded" });
         }
-        // console.log("hit hua");
-
         const pdfBuffer = fs.readFileSync(req.file.path);
         const data = await pdfParse(pdfBuffer);
 
@@ -46,7 +48,7 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
 
         res.status(200).json({ conversionId: newConversion._id, newConversion });
     } catch (error) {
-        console.error(error);
+        console.error("catch hora");
         if (req.file && req.file.path) {
             try {
                 await fs.promises.unlink(req.file.path);
@@ -61,6 +63,9 @@ app.post("/convert", authUser, upload.single("pdfFile"), async (req, res) => {
 
 app.get("/all", authUser, async (req, res) => {
     try {
+        if (!req.user.userId) {
+            return res.status(401).json({ message: "Please login first." });
+        }
         const userId = req.user.userId;
         const conversions = await Conversion.find({ userId }).sort({ createdAt: -1 }).lean();
         if (conversions.length === 0) return res.status(404).json({ message: "No conversions found" });
@@ -76,7 +81,7 @@ app.get("/:id", authUser, async (req, res) => {
         const { id } = req.params;
         const conversion = await Conversion.findById(id).lean();
         if (!conversion) return res.status(404).json({ message: "Conversion not found" });
-        
+
         if (conversion.userId.toString() !== req.user.userId) {
             return res.status(403).json({ message: "Access denied" });
         }

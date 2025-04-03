@@ -13,6 +13,10 @@ export function FileUpload({ onFileSelect }: FileUploadProps) {
       if (file && file.type === 'application/pdf') {
         onFileSelect(file);
       }
+      else {
+        alert("Only PDF files are allowed!");
+        return;
+      }
     },
     [onFileSelect]
   );

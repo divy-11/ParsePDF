@@ -5,8 +5,10 @@ const JWT_TOKEN = process.env.TOKEN_AUTH;
 
 const authUser = (req, res, next) => {
     const token = req.cookies.token;
+    // console.log(token);
     if (!token) {
-        return res.status(401).json({ message: "Unauthorized: No token provided" });
+        // console.log("Unauthorized: No token provided");
+        return res.status(401).json({Unauthorized: "No token provided" });
     }
     try {
         const decoded = jwt.verify(token, JWT_TOKEN);
