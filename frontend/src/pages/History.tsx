@@ -59,11 +59,11 @@ export function History() {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-5">
           Conversion History
         </h1>
         {load && (<h2>Loading ...</h2>)}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {currentConversions.map((conv) => (
             <div key={conv._id}>
               <ConversionCard conversion={conv} isExpanded={selConv == conv._id} isToggle={handleClick} />
@@ -105,7 +105,7 @@ export function History() {
             </button>
           </div>)
         }
-        {!(convs.length == 0) && (<div className="mt-6 flex justify-between items-center">
+        {!(convs.length == 0) && (<div className="mt-4 flex justify-between items-center">
           <button onClick={handlePrevious} disabled={currentPage === 1} className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500">
             Previous
           </button>

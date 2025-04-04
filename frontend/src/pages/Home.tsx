@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileUpload } from "../components/FileUpload";
 import { Layout } from "../components/Layout";
 import axios from "axios";
@@ -25,7 +25,13 @@ export function Home() {
     setUploadedPdfUrl(URL.createObjectURL(file));
     setErrorMessage(null);
   };
-
+  useEffect(()=>{
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate('/')
+    }
+  },[])
+  
   const handleConvert = async () => {
     if (!selectedFile) {
       setErrorMessage("Please select a file first!");
@@ -38,9 +44,6 @@ export function Home() {
       const formData = new FormData();
       formData.append("pdfFile", selectedFile);
       const token = localStorage.getItem("token");
-      if (!token) {
-        navigate('/')
-      }
       const response = await axios.post(
         "https://parsepdf.onrender.com/api/conversion/convert",
         formData, {
