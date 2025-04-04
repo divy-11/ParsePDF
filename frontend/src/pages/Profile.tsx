@@ -20,7 +20,16 @@ export function Profile() {
 
   const fetchUser = async () => {
     try {
-      const resp = await axios.get("https://parsepdf.onrender.com/api/user/", { withCredentials: true })
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/')
+      }
+      const resp = await axios.get("https://parsepdf.onrender.com/api/user/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
       setUser(resp.data)
     } catch (err: any) {
       console.log("Error", err);
@@ -49,11 +58,19 @@ export function Profile() {
       return;
     }
     try {
-      await axios.put("https://parsepdf.onrender.com/api/user/", {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/')
+      }
+      await axios.put("https://parsepdf.onrender.com/api/user", {
         name,
         curPass: currentPassword,
         password: newPassword || undefined,
-      }, { withCredentials: true }
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
       );
 
       console.log('Profile Updated');

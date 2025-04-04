@@ -5,10 +5,7 @@ const router = require("./routes");
 const cookieParser = require("cookie-parser");
 const { connectDB } = require("./db");
 
-app.use(cors({
-    origin: "http://localhost:5173",  // React frontend URL
-    credentials: true  // Allow cookies & auth headers
-}));
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 connectDB();

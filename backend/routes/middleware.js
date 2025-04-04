@@ -4,19 +4,21 @@ require("dotenv").config();
 const JWT_TOKEN = process.env.TOKEN_AUTH;
 
 const authUser = (req, res, next) => {
-    const token = req.cookies.token;
-    // console.log(token);
-    if (!token) {
-        // console.log("Unauthorized: No token provided");
-        return res.status(401).json({Unauthorized: "No token provided" });
+    const authorization = req.headers.authorization;
+    if (!authorization.startsWith("Bearer ")) {
+        return res.status(401).json({ Unauthorized: "No token provided" });
+    } else {
+        const token = authorization.split(' ')[1];
+        // console.log(token);
+        try {
+            const decoded = jwt.verify(token, JWT_TOKEN);
+            req.user = decoded;
+            next();
+        } catch (error) {
+            console.error("JWT verification error:", error.message);
+            return res.status(403).json({ message: "Invalid token" });
+        }
     }
-    try {
-        const decoded = jwt.verify(token, JWT_TOKEN);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(403).json({ message: "Invalid token" });
-    }
-};
+}
 
 module.exports = authUser;

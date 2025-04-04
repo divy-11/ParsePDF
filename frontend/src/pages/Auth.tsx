@@ -20,10 +20,11 @@ export function Auth() {
         email,
         password
       },
-        { headers: { "Content-Type": "application/json" }, withCredentials: true }
-
+        { headers: { "Content-Type": "application/json" } }
       );
+      localStorage.setItem("token", resp.data.token);
       navigate('/home');
+      // console.log(resp.data.token);
     }
     catch (err) {
       console.log(err);

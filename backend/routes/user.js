@@ -25,7 +25,7 @@ app.post("/signup", async (req, res) => {
         });
 
         const token = jwt.sign({ userId: userCreated._id }, JWT_TOKEN);
-        res.cookie("token", token, COOKIE_OPTIONS);
+        
         res.status(200).json({
             message: "User Created !",
             userId: userCreated._id,
@@ -47,9 +47,9 @@ app.post("/login", async (req, res) => {
         }
 
         const token = jwt.sign({ userId: userCheck._id }, JWT_TOKEN);
-        res.cookie("token", token, COOKIE_OPTIONS);
+        
         res.status(200).json({
-            token: 'Bearer ' + token,
+            token,
             userId: userCheck._id,
         });
     } catch (error) {
@@ -58,17 +58,6 @@ app.post("/login", async (req, res) => {
     }
 });
 
-app.post("/logout", (req, res) => {
-    try {
-        res.clearCookie("token", {
-            path: "/", httpOnly: true,
-            secure: true, sameSite: "None"
-        });
-        res.status(200).json({ message: "Logged out successfully" });
-    } catch (error) {
-        console.log(error);
-    }
-});
 
 app.get("/", authUser, async (req, res) => {
 

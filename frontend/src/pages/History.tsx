@@ -15,7 +15,16 @@ export function History() {
   const navigate = useNavigate()
   const fetchConv = async () => {
     try {
-      const resp = await axios.get("https://parsepdf.onrender.com/api/conversion/all", { withCredentials: true })
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/')
+      }
+      const resp = await axios.get("https://parsepdf.onrender.com/api/conversion/all", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(resp.data);
       setConvs(resp.data.conversions)
       setLoad(false)
     } catch (err: any) {
@@ -23,6 +32,8 @@ export function History() {
       if (err.response && err.response.status === 401) {
         navigate('/')
         return
+      } else {
+        setLoad(false)
       }
     }
   }

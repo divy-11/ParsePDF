@@ -21,12 +21,12 @@ const PdfPreview = ({ fileUrl }: { fileUrl: string }) => {
                     </div>
                 </div>
 
-                {/* PDF Viewer */}
                 <div className="flex-1 flex items-center justify-center relative overflow-hidden">
                     {loading && (
                         <p className="absolute text-gray-600">Loading PDF...</p>
                     )}
                     <Viewer
+                        key={fileUrl}
                         fileUrl={fileUrl}
                         plugins={[zoomPluginInstance]}
                         onDocumentLoad={() => setLoading(false)}

@@ -37,11 +37,18 @@ export function Home() {
       setErrorMessage(null);
       const formData = new FormData();
       formData.append("pdfFile", selectedFile);
-
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate('/')
+      }
       const response = await axios.post(
         "https://parsepdf.onrender.com/api/conversion/convert",
-        formData,
-        { withCredentials: true }
+        formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
       );
       setConversionResult(response.data.newConversion.xmlContent);
       setShowPreview(false)
@@ -109,7 +116,7 @@ export function Home() {
           <div className="mt-6 gap-6">
             {uploadedPdfUrl && (
               <div className="mt-4">
-              
+
                 <button
                   className="text-blue-600 text-sm hover:underline"
                   onClick={() => setShowPreview(!showPreview)}
@@ -117,7 +124,7 @@ export function Home() {
                   {showPreview ? "Hide Preview" : "Show Preview"}
                 </button>
 
-                
+
                 {showPreview && <PdfPreview fileUrl={uploadedPdfUrl} />}
               </div>
             )}
@@ -129,7 +136,7 @@ export function Home() {
                 <div className="overflow-auto max-h-96 border p-2 bg-white rounded relative">
                   <XMLViewer xml={conversionResult} />
 
-                  
+
                   <button
                     className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-sm px-2 py-1 rounded"
                     onClick={() => navigator.clipboard.writeText(conversionResult)}
@@ -138,7 +145,7 @@ export function Home() {
                   </button>
                 </div>
 
-                
+
                 <button
                   className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   onClick={() => {

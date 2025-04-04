@@ -20,13 +20,11 @@ export function Layout({ children }: LayoutProps) {
 
   const handleLogout = async () => {
     try {
-      const resp = await axios.post("https://parsepdf.onrender.com/api/user/logout")
-      console.log(resp.data.message)
+      localStorage.removeItem("token")
       navigate('/')
     }
     catch (err) {
       console.log(err);
-
     }
   }
   return (
