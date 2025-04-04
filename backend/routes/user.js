@@ -5,7 +5,7 @@ const { User } = require("../db")
 const jwt = require("jsonwebtoken");
 const authUser = require('./middleware');
 const JWT_TOKEN = process.env.TOKEN_AUTH;
-const COOKIE_OPTIONS = { httpOnly: true, secure: true,  sameSite: "None" };
+const COOKIE_OPTIONS = { httpOnly: true, secure: true, sameSite: "None" };
 
 app.post("/signup", async (req, res) => {
     const username = req.body.name
@@ -60,7 +60,10 @@ app.post("/login", async (req, res) => {
 
 app.post("/logout", (req, res) => {
     try {
-        res.clearCookie("token", { path: "/", httpOnly: true, sameSite: "lax" });
+        res.clearCookie("token", {
+            path: "/", httpOnly: true,
+            secure: true, sameSite: "None"
+        });
         res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
         console.log(error);

@@ -19,9 +19,15 @@ export function Layout({ children }: LayoutProps) {
   // };
 
   const handleLogout = async () => {
-    const resp = await axios.post("http://localhost:6060/api/user/logout")
-    console.log(resp.data.message)
-    navigate('/')
+    try {
+      const resp = await axios.post("https://parsepdf.onrender.com/api/user/logout")
+      console.log(resp.data.message)
+      navigate('/')
+    }
+    catch (err) {
+      console.log(err);
+
+    }
   }
   return (
     <div className="min-h-screen bg-gray-50 flex">
