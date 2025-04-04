@@ -8,10 +8,10 @@ type AuthMode = 'login' | 'signup';
 export function Auth() {
   const [mode, setMode] = useState<AuthMode>('login');
   const navigate = useNavigate();
+  const [error1, setError] = useState('')
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-
   async function sendingReq(e: React.FormEvent) {
     e.preventDefault();
     try {
@@ -24,16 +24,17 @@ export function Auth() {
       );
       localStorage.setItem("token", resp.data.token);
       navigate('/home');
+      setError('');
       // console.log(resp.data.token);
     }
     catch (err: any) {
-      console.log(err);
-      if (err.response && err.response.status === 401) {
-        alert("Email already taken.")
-        return
+      // console.log(err.response.data);
+      if (err.response.status == 500) {
+        setError("Error while signing up");
       } else {
-        alert("Error while signing up");
+        setError(err.response.data.message)
       }
+      return
     }
   }
 
@@ -113,7 +114,7 @@ export function Auth() {
               </div>
             </div>
           </div>
-
+          {error1 && <p className="text-red-500 text-sm">{error1}</p>}
           <div>
             <button
               type="submit"
@@ -126,7 +127,7 @@ export function Auth() {
           <div className="text-sm text-center">
             <button
               type="button"
-              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setEmail(''); setPassword(''); setName('') }}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
               {mode === 'login'
@@ -135,7 +136,7 @@ export function Auth() {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

@@ -15,7 +15,7 @@ app.post("/signup", async (req, res) => {
     const sameUser = await User.findOne({ email });
 
     if (sameUser) {
-        return res.status(400).json({ message: "User already Exists." });
+        return res.status(400).json({ message: "Email already taken." });
     }
     try {
         const userCreated = await User.create({
@@ -43,7 +43,7 @@ app.post("/login", async (req, res) => {
         const userCheck = await User.findOne({ email, password });
 
         if (!userCheck) {
-            return res.status(401).json({ message: "Invalid Creds" });
+            return res.status(400).json({ message: "Invalid Credentials" });
         }
 
         const token = jwt.sign({ userId: userCheck._id }, JWT_TOKEN);
