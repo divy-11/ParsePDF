@@ -26,9 +26,14 @@ export function Auth() {
       navigate('/home');
       // console.log(resp.data.token);
     }
-    catch (err) {
+    catch (err: any) {
       console.log(err);
-      alert("Error while signing up");
+      if (err.response && err.response.status === 401) {
+        alert("Email already taken.")
+        return
+      } else {
+        alert("Error while signing up");
+      }
     }
   }
 
