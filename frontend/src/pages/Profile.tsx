@@ -20,7 +20,7 @@ export function Profile() {
 
   const fetchUser = async () => {
     try {
-      const resp = await axios.get("http://localhost:6060/api/user/", { withCredentials: true })
+      const resp = await axios.get("https://parsepdf.onrender.com/api/user/", { withCredentials: true })
       setUser(resp.data)
     } catch (err: any) {
       console.log("Error", err);
@@ -49,7 +49,7 @@ export function Profile() {
       return;
     }
     try {
-      await axios.put("http://localhost:6060/api/user/", {
+      await axios.put("https://parsepdf.onrender.com/api/user/", {
         name,
         curPass: currentPassword,
         password: newPassword || undefined,

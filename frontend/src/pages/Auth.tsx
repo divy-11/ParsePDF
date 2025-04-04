@@ -15,7 +15,7 @@ export function Auth() {
   async function sendingReq(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const resp = await axios.post(`http://localhost:6060/api/user/${mode}`, {
+      const resp = await axios.post(`https://parsepdf.onrender.com/api/user/${mode}`, {
         name,
         email,
         password

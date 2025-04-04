@@ -11,12 +11,12 @@ export function Home() {
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [isConverting, setIsConverting] = useState<boolean>(false);
   const [uploadedPdfUrl, setUploadedPdfUrl] = useState<string | null>(null);
-  const [showPreview,setShowPreview]=useState<boolean>(true);
+  const [showPreview, setShowPreview] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleFileSelect = (file: File) => {
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    if (file.size > 10 * 1024 * 1024) {
       setErrorMessage("File size exceeds 10MB limit!");
       return;
     }
@@ -39,7 +39,7 @@ export function Home() {
       formData.append("pdfFile", selectedFile);
 
       const response = await axios.post(
-        "http://localhost:6060/api/conversion/convert",
+        "https://parsepdf.onrender.com/api/conversion/convert",
         formData,
         { withCredentials: true }
       );
@@ -105,11 +105,11 @@ export function Home() {
         )}
 
 
-        {uploadedPdfUrl && (
+        {uploadedPdfUrl && (selectedFile) && (
           <div className="mt-6 gap-6">
             {uploadedPdfUrl && (
               <div className="mt-4">
-                {/* Toggle Button for Preview */}
+              
                 <button
                   className="text-blue-600 text-sm hover:underline"
                   onClick={() => setShowPreview(!showPreview)}
@@ -117,7 +117,7 @@ export function Home() {
                   {showPreview ? "Hide Preview" : "Show Preview"}
                 </button>
 
-                {/* PDF Preview (Toggles On/Off) */}
+                
                 {showPreview && <PdfPreview fileUrl={uploadedPdfUrl} />}
               </div>
             )}
@@ -129,7 +129,7 @@ export function Home() {
                 <div className="overflow-auto max-h-96 border p-2 bg-white rounded relative">
                   <XMLViewer xml={conversionResult} />
 
-                  {/* Copy Button */}
+                  
                   <button
                     className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 text-sm px-2 py-1 rounded"
                     onClick={() => navigator.clipboard.writeText(conversionResult)}
@@ -138,7 +138,7 @@ export function Home() {
                   </button>
                 </div>
 
-                {/* Download Button */}
+                
                 <button
                   className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   onClick={() => {
